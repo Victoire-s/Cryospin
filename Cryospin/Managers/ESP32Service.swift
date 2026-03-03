@@ -1,6 +1,8 @@
 import Foundation
 import Combine
 
+class ESP32Service: ObservableObject {
+
     let baseURL = "http://192.168.4.1"
     
     @Published var lastRequestStatus: String = ""
