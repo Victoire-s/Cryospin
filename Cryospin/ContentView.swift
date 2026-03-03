@@ -16,8 +16,12 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            // Elegant Background
-            Color(red: 0.1, green: 0.12, blue: 0.15).ignoresSafeArea()
+            // Vidéo en arrière-plan (Assurez-vous d'avoir ajouté "background.mov" au projet)
+            VideoBackgroundView(videoName: "background", videoExtension: "mov")
+                .ignoresSafeArea()
+            
+            // Masque sombre pour que l'interface reste bien lisible par-dessus la vidéo
+            Color.black.opacity(0.4).ignoresSafeArea()
             
             VStack(spacing: 0) {
                 // Header
