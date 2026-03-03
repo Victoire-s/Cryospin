@@ -13,14 +13,16 @@ struct ContentView: View {
     // Manual Mode State
     @State private var isManualFanOn: Bool = false
     @State private var manualFanPower: Double = 50.0
+    // Service réseau ESP32
+    @StateObject private var esp32 = ESP32Service()
+    
+    @Namespace private var menuAnimation
     
     var body: some View {
         ZStack {
-            // Vidéo en arrière-plan (Assurez-vous d'avoir ajouté "background.mov" au projet)
             VideoBackgroundView(videoName: "background", videoExtension: "mov")
                 .ignoresSafeArea()
             
-            // Masque sombre pour que l'interface reste bien lisible par-dessus la vidéo
             Color.black.opacity(0.4).ignoresSafeArea()
             
             VStack(spacing: 0) {
@@ -29,21 +31,10 @@ struct ContentView: View {
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
                     .tracking(4)
-                    .padding(.top, 20)
+                    .padding(.top, 10)
                 
-                // Custom Tab Selector
-                HStack {
-                    TabButton(title: "AUTO", isSelected: selectedTab == 0) {
-                        withAnimation { selectedTab = 0 }
-                    }
-                    TabButton(title: "MANUEL", isSelected: selectedTab == 1) {
-                        withAnimation { selectedTab = 1 }
-                    }
-                }
-                .padding(.horizontal, 40)
-                .padding(.top, 20)
+                Spacer()
                 
-                // Central Gauge
                 TemperatureGauge(
                     currentTemp: currentTemp,
                     startTemp: selectedTab == 0 ? startTemp : nil,
@@ -51,18 +42,59 @@ struct ContentView: View {
                     isFanActive: selectedTab == 1 ? isManualFanOn : currentTemp >= startTemp
                 )
                 .padding(.top, 40)
-                .padding(.bottom, 30)
                 
-                // Content based on tab
-                ScrollView {
-                    if selectedTab == 0 {
-                        autoModeControls
-                            .transition(.opacity)
-                    } else {
-                        manualModeControls
-                            .transition(.opacity)
+                Spacer()
+                
+                ScrollView(showsIndicators: false) {
+                    VStack {
+                        if selectedTab == 0 {
+                            autoModeControls
+                                .transition(.opacity)
+                        } else {
+                            manualModeControls
+                                .transition(.opacity)
+                        }
+                    }
+                    .padding(.top, 20)
+                    .padding(.bottom, 40)
+                }
+                .frame(maxHeight: 280)
+            }
+            .ignoresSafeArea(edges: .bottom)
+            
+            VStack {
+                HStack(spacing: 0) {
+                    TabButton(
+                        title: "AUTO",
+                        icon: "thermometer.sun.fill",
+                        isSelected: selectedTab == 0,
+                        namespace: menuAnimation
+                    ) {
+                        withAnimation(.interactiveSpring(response: 0.4, dampingFraction: 0.7, blendDuration: 0.5)) { 
+                            selectedTab = 0 
+                        }
+                    }
+                    
+                    TabButton(
+                        title: "MANUEL",
+                        icon: "hand.tap.fill",
+                        isSelected: selectedTab == 1,
+                        namespace: menuAnimation
+                    ) {
+                        withAnimation(.interactiveSpring(response: 0.4, dampingFraction: 0.7, blendDuration: 0.5)) { 
+                            selectedTab = 1 
+                        }
                     }
                 }
+                .padding(6)
+                .background(.ultraThinMaterial, in: Capsule())
+                .overlay(
+                    Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 15)
+                .padding(.top, 60)
+                
+                Spacer()
             }
         }
         .preferredColorScheme(.dark)
@@ -129,7 +161,6 @@ struct ContentView: View {
                 )
             }
             .padding(.horizontal, 20)
-            .padding(.bottom, 20)
         }
     }
     
@@ -144,6 +175,12 @@ struct ContentView: View {
                         generator.impactOccurred()
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                             isManualFanOn.toggle()
+                        }
+                        
+                        if isManualFanOn {
+                            esp32.turnOnFan()
+                        } else {
+                            esp32.turnOffFan()
                         }
                     }) {
                         ZStack {

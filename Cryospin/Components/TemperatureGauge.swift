@@ -6,7 +6,6 @@ struct TemperatureGauge: View {
     var endTemp: Double?
     var isFanActive: Bool
     
-    // Scale 30°C to 42°C
     let minT: Double = 30.0
     let range: Double = 12.0
     
@@ -16,14 +15,11 @@ struct TemperatureGauge: View {
     
     var body: some View {
         ZStack {
-            // Background track (3/4 of a circle)
             Circle()
                 .trim(from: 0, to: 0.75)
                 .stroke(Color.white.opacity(0.04), style: StrokeStyle(lineWidth: 24, lineCap: .round))
                 .rotationEffect(.degrees(135))
                 .frame(width: 250, height: 250)
-            
-            // Active fan glow effect behind
             if isFanActive {
                 Circle()
                     .trim(from: 0, to: 0.75)
@@ -34,7 +30,6 @@ struct TemperatureGauge: View {
                     .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: isFanActive)
             }
             
-            // Full gradient track
             let gradient = AngularGradient(
                 gradient: Gradient(colors: [Color.blue, Color.cyan, Color.orange, Color.red]),
                 center: .center,
@@ -43,16 +38,14 @@ struct TemperatureGauge: View {
             )
             
             Circle()
-                .trim(from: 0, to: 0.75) // Remplit tout le track visible
+                .trim(from: 0, to: 0.75)
                 .stroke(gradient, style: StrokeStyle(lineWidth: 24, lineCap: .round))
                 .rotationEffect(.degrees(135))
                 .frame(width: 250, height: 250)
             
-            // Current temperature marker/progress overlay
             let tempPercent = percent(for: currentTemp)
-            
-            // Curseur pour la température actuelle (Gros point blanc par exemple)
             let currentAngle = 135 + (tempPercent * 270)
+            
             Circle()
                 .fill(Color.white)
                 .frame(width: 24, height: 24)
@@ -60,8 +53,6 @@ struct TemperatureGauge: View {
                 .offset(x: 125)
                 .rotationEffect(.degrees(currentAngle))
                 .animation(.spring(response: 0.5, dampingFraction: 0.7), value: currentTemp)
-            
-            // Markers
             if let end = endTemp {
                 let endAngle = 135 + (percent(for: end) * 270)
                 Circle()
@@ -86,7 +77,6 @@ struct TemperatureGauge: View {
                     .animation(.spring(), value: start)
             }
             
-            // Inner Content
             VStack(spacing: 4) {
                 if isFanActive {
                     Image(systemName: "wind")
@@ -103,7 +93,7 @@ struct TemperatureGauge: View {
                     Text(String(format: "%.1f", currentTemp))
                         .font(.system(size: 68, weight: .thin, design: .rounded))
                         .foregroundColor(.white)
-                        .contentTransition(.numericText()) // smooth numeric transition when currentTemp changes
+                        .contentTransition(.numericText())
                     Text("°C")
                         .font(.title2)
                         .foregroundColor(.gray)
@@ -140,7 +130,6 @@ struct TemperatureGauge: View {
                     }
                     .padding(.top, 5)
                 } else {
-                    // Manual mode
                     Text("MODE MANUEL")
                         .font(.system(size: 12, weight: .black, design: .rounded))
                         .foregroundColor(.white.opacity(0.2))
