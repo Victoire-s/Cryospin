@@ -169,15 +169,11 @@ struct ContentView: View {
                     Text("Historique des sessions")
                 }
                 .font(.headline)
-                .foregroundColor(Color(red: 0.106, green: 0.118, blue: 0.894))
+                .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color(red: 0.106, green: 0.118, blue: 0.894).opacity(0))
+                .background(Color(red: 0.106, green: 0.118, blue: 0.894))
                 .cornerRadius(15)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 15)
-                        .stroke(Color(red: 0.106, green: 0.118, blue: 0.894).opacity(0.3), lineWidth: 1)
-                )
             }
             .padding(.horizontal, 20)
         }
