@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedTab = 0
-    @State private var currentTemp: Double = 37.2
     
     // Auto Mode State
     @State private var startTemp: Double = 38.0
@@ -11,7 +10,6 @@ struct ContentView: View {
     @State private var autoDuration: Double = 5.0 // minutes
     
     // Manual Mode State
-    @State private var isManualFanOn: Bool = false
     @State private var manualFanPower: Double = 50.0
     // Service réseau ESP32
     @StateObject private var esp32 = ESP32Service()
@@ -36,10 +34,10 @@ struct ContentView: View {
                 Spacer()
                 
                 TemperatureGauge(
-                    currentTemp: currentTemp,
+                    currentTemp: esp32.bodyTemperature,
                     startTemp: selectedTab == 0 ? startTemp : nil,
                     endTemp: selectedTab == 0 ? endTemp : nil,
-                    isFanActive: selectedTab == 1 ? isManualFanOn : currentTemp >= startTemp
+                    isFanActive: selectedTab == 1 ? esp32.isFanOn : esp32.bodyTemperature >= startTemp
                 )
                 .padding(.top, 40)
                 
@@ -96,6 +94,12 @@ struct ContentView: View {
                 
                 Spacer()
             }
+        }
+        .onAppear {
+            esp32.startPolling()
+        }
+        .onDisappear {
+            esp32.stopPolling()
         }
         .preferredColorScheme(.dark)
     }
@@ -173,28 +177,26 @@ struct ContentView: View {
                     Button(action: {
                         let generator = UIImpactFeedbackGenerator(style: .medium)
                         generator.impactOccurred()
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                            isManualFanOn.toggle()
-                        }
                         
-                        if isManualFanOn {
-                            esp32.turnOnFan()
-                        } else {
+                        if esp32.isFanOn {
                             esp32.turnOffFan()
+                        } else {
+                            esp32.turnOnFan()
                         }
                     }) {
                         ZStack {
                             Circle()
-                                .fill(isManualFanOn ? Color.cyan : Color.white.opacity(0.05))
+                                .fill(esp32.isFanOn ? Color.cyan : Color.white.opacity(0.05))
                                 .frame(width: 120, height: 120)
-                                .shadow(color: isManualFanOn ? Color.cyan.opacity(0.6) : .clear, radius: 25, x: 0, y: 10)
+                                .shadow(color: esp32.isFanOn ? Color.cyan.opacity(0.6) : .clear, radius: 25, x: 0, y: 10)
                             
                             Image(systemName: "power")
                                 .font(.system(size: 45, weight: .bold))
-                                .foregroundColor(isManualFanOn ? .white : .gray.opacity(0.5))
+                                .foregroundColor(esp32.isFanOn ? .white : .gray.opacity(0.5))
                         }
                     }
                     .padding(.top, 10)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: esp32.isFanOn)
                     
                     // Power Slider
                     DualSliderView(
@@ -204,8 +206,8 @@ struct ContentView: View {
                         unit: "%",
                         color: .cyan
                     )
-                    .opacity(isManualFanOn ? 1.0 : 0.4)
-                    .disabled(!isManualFanOn)
+                    .opacity(esp32.isFanOn ? 1.0 : 0.4)
+                    .disabled(!esp32.isFanOn)
                 }
             }
         }
