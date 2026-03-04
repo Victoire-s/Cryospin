@@ -4,61 +4,82 @@ struct ContentView: View {
     @State private var selectedTab = 0
     @State private var currentTemp: Double = 37.2
     
-    // Auto Mode State
     @State private var startTemp: Double = 38.0
     @State private var endTemp: Double = 36.5
     @State private var autoFanPower: Double = 70.0
     @State private var autoDuration: Double = 5.0 // minutes
     
-    // Manual Mode State
     @State private var isManualFanOn: Bool = false
     @State private var manualFanPower: Double = 50.0
-    // Service réseau ESP32
+    
     @StateObject private var esp32 = ESP32Service()
+    
+    @State private var isVideoPlaying: Bool = true
     
     @Namespace private var menuAnimation
     
     var body: some View {
         ZStack {
-            VideoBackgroundView(videoName: "background", videoExtension: "mov")
+            VideoBackgroundView(videoName: "background", videoExtension: "mov", isPlaying: $isVideoPlaying)
                 .ignoresSafeArea()
             
-            Color.black.opacity(0.4).ignoresSafeArea()
+            Color.black
+                .ignoresSafeArea()
+                .opacity(isVideoPlaying ? 0 : 0.85)
+                .animation(.easeInOut(duration: 0.6), value: isVideoPlaying)
             
             VStack(spacing: 0) {
-                // Header
-                Text("CRYOSPIN")
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                    .tracking(4)
-                    .padding(.top, 10)
-                
-                Spacer()
-                
-                TemperatureGauge(
-                    currentTemp: currentTemp,
-                    startTemp: selectedTab == 0 ? startTemp : nil,
-                    endTemp: selectedTab == 0 ? endTemp : nil,
-                    isFanActive: selectedTab == 1 ? isManualFanOn : currentTemp >= startTemp
-                )
-                .padding(.top, 40)
-                
-                Spacer()
+                HStack {
+                    Button(action: {
+                        withAnimation {
+                            isVideoPlaying.toggle()
+                        }
+                    }) {
+                        Image(systemName: isVideoPlaying ? "pause.circle.fill" : "play.circle.fill")
+                            .font(.system(size: 28))
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+                    .padding(.leading, 20)
+                    
+                    Spacer()
+                    
+                    Text("CRYOSPIN")
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                        .tracking(4)
+                        .padding(.trailing, 20)
+                    
+                    Spacer()
+                }
+                .padding(.top, 10)
+                .padding(.bottom, 20)
                 
                 ScrollView(showsIndicators: false) {
-                    VStack {
-                        if selectedTab == 0 {
-                            autoModeControls
-                                .transition(.opacity)
-                        } else {
-                            manualModeControls
-                                .transition(.opacity)
+                        VStack(spacing: 0) {
+                            Spacer(minLength: 120)
+                            
+                            TemperatureGauge(
+                                currentTemp: currentTemp,
+                                startTemp: selectedTab == 0 ? startTemp : nil,
+                                endTemp: selectedTab == 0 ? endTemp : nil,
+                                isFanActive: selectedTab == 1 ? isManualFanOn : currentTemp >= startTemp
+                            )
+                            
+                            Spacer(minLength: 80)
+                            
+                            VStack {
+                                if selectedTab == 0 {
+                                    autoModeControls
+                                        .transition(.opacity)
+                                } else {
+                                    manualModeControls
+                                        .transition(.opacity)
+                                }
+                            }
+                            .padding(.bottom, 140)
                         }
-                    }
-                    .padding(.top, 20)
-                    .padding(.bottom, 40)
+                        .frame(minHeight: UIScreen.main.bounds.height - 150)
                 }
-                .frame(maxHeight: 280)
             }
             .ignoresSafeArea(edges: .bottom)
             
@@ -89,9 +110,9 @@ struct ContentView: View {
                 .padding(6)
                 .background(.ultraThinMaterial, in: Capsule())
                 .overlay(
-                    Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1)
+                    Capsule().stroke(Color.white.opacity(0), lineWidth: 1)
                 )
-                .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 15)
+                .shadow(color: .black.opacity(0), radius: 20, x: 0, y: 15)
                 .padding(.top, 60)
                 
                 Spacer()
@@ -100,7 +121,6 @@ struct ContentView: View {
         .preferredColorScheme(.dark)
     }
     
-    // MARK: - Auto Mode Controls
     var autoModeControls: some View {
         VStack(spacing: 25) {
             ControlCard(title: "Seuils de déclenchement") {
@@ -130,7 +150,7 @@ struct ContentView: View {
                         value: $autoFanPower,
                         range: 0...100,
                         unit: "%",
-                        color: .cyan
+                        color: Color(red: 0.106, green: 0.118, blue: 0.894)
                     )
                     
                     DualSliderView(
@@ -143,33 +163,30 @@ struct ContentView: View {
                 }
             }
             
-            // Future feature placeholder
             Button(action: {}) {
                 HStack {
                     Image(systemName: "chart.xyaxis.line")
                     Text("Historique des sessions")
                 }
                 .font(.headline)
-                .foregroundColor(.cyan)
+                .foregroundColor(Color(red: 0.106, green: 0.118, blue: 0.894))
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color.cyan.opacity(0.1))
+                .background(Color(red: 0.106, green: 0.118, blue: 0.894).opacity(0))
                 .cornerRadius(15)
                 .overlay(
                     RoundedRectangle(cornerRadius: 15)
-                        .stroke(Color.cyan.opacity(0.3), lineWidth: 1)
+                        .stroke(Color(red: 0.106, green: 0.118, blue: 0.894).opacity(0.3), lineWidth: 1)
                 )
             }
             .padding(.horizontal, 20)
         }
     }
     
-    // MARK: - Manual Mode Controls
     var manualModeControls: some View {
         VStack(spacing: 25) {
             ControlCard(title: "Contrôle Direct") {
                 VStack(spacing: 40) {
-                    // Big Toggle Button
                     Button(action: {
                         let generator = UIImpactFeedbackGenerator(style: .medium)
                         generator.impactOccurred()
@@ -185,9 +202,9 @@ struct ContentView: View {
                     }) {
                         ZStack {
                             Circle()
-                                .fill(isManualFanOn ? Color.cyan : Color.white.opacity(0.05))
+                                .fill(isManualFanOn ? Color(red: 0.106, green: 0.118, blue: 0.894) : Color.white.opacity(0.05))
                                 .frame(width: 120, height: 120)
-                                .shadow(color: isManualFanOn ? Color.cyan.opacity(0.6) : .clear, radius: 25, x: 0, y: 10)
+                                .shadow(color: isManualFanOn ? Color(red: 0.106, green: 0.118, blue: 0.894).opacity(0.6) : .clear, radius: 25, x: 0, y: 10)
                             
                             Image(systemName: "power")
                                 .font(.system(size: 45, weight: .bold))
@@ -196,13 +213,12 @@ struct ContentView: View {
                     }
                     .padding(.top, 10)
                     
-                    // Power Slider
                     DualSliderView(
                         title: "Puissance du ventilateur",
                         value: $manualFanPower,
                         range: 0...100,
                         unit: "%",
-                        color: .cyan
+                        color: Color(red: 0.106, green: 0.118, blue: 0.894)
                     )
                     .opacity(isManualFanOn ? 1.0 : 0.4)
                     .disabled(!isManualFanOn)

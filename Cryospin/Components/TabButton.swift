@@ -23,9 +23,9 @@ struct TabButton: View {
                 ZStack {
                     if isSelected {
                         Capsule()
-                            .fill(Color.cyan.opacity(0.8))
+                            .fill(Color(red: 0.106, green: 0.118, blue: 0.894).opacity(0.8))
                             .matchedGeometryEffect(id: "TabPill", in: namespace)
-                            .shadow(color: Color.cyan.opacity(0.4), radius: 8, x: 0, y: 4)
+                            .shadow(color: Color(red: 0.106, green: 0.118, blue: 0.894).opacity(0.4), radius: 8, x: 0, y: 4)
                     }
                 }
             )

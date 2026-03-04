@@ -2,14 +2,11 @@ import SwiftUI
 
 struct WiFiConnectionView: View {
     @State private var isPulsing = false
-    
-    // Gestionnaire de connexion au Collier The Cryospin
     @StateObject private var wifiManager = WiFiManager()
     
     var body: some View {
         ZStack {
-            // Vidéo en arrière-plan
-            VideoBackgroundView(videoName: "background", videoExtension: "mov")
+            VideoBackgroundView(videoName: "background", videoExtension: "mov", isPlaying: .constant(true))
                 .ignoresSafeArea()
             Color.black.opacity(0.6).ignoresSafeArea()
             
@@ -66,7 +63,6 @@ struct WiFiConnectionView: View {
                 Button(action: {
                     let generator = UIImpactFeedbackGenerator(style: .heavy)
                     generator.impactOccurred()
-                    // Lancement de la demande de configuration
                     wifiManager.connectToESP32()
                 }) {
                     HStack {

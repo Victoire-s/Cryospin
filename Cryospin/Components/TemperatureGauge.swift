@@ -23,7 +23,7 @@ struct TemperatureGauge: View {
             if isFanActive {
                 Circle()
                     .trim(from: 0, to: 0.75)
-                    .stroke(Color.cyan.opacity(0.4), style: StrokeStyle(lineWidth: 24, lineCap: .round))
+                    .stroke(Color(red: 0.106, green: 0.118, blue: 0.894).opacity(0.4), style: StrokeStyle(lineWidth: 24, lineCap: .round))
                     .rotationEffect(.degrees(135))
                     .frame(width: 250, height: 250)
                     .blur(radius: 20)
@@ -31,7 +31,7 @@ struct TemperatureGauge: View {
             }
             
             let gradient = AngularGradient(
-                gradient: Gradient(colors: [Color.blue, Color.cyan, Color.orange, Color.red]),
+                gradient: Gradient(colors: [Color.blue, Color(red: 0.106, green: 0.118, blue: 0.894), Color.orange, Color.red]),
                 center: .center,
                 startAngle: .degrees(135),
                 endAngle: .degrees(135 + 270)
@@ -81,7 +81,7 @@ struct TemperatureGauge: View {
                 if isFanActive {
                     Image(systemName: "wind")
                         .font(.system(size: 32, weight: .semibold))
-                        .foregroundColor(.cyan)
+                        .foregroundColor(Color(red: 0.106, green: 0.118, blue: 0.894))
                         .modifier(SpinningAnimation())
                 } else {
                     Image(systemName: "wind")
