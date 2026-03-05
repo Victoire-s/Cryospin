@@ -1,12 +1,16 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var selectedTab = 0
+    
+    // Auto Mode State
     @State private var startTemp: Double = 38.0
     @State private var endTemp: Double = 36.5
     @State private var autoFanPower: Double = 70.0
     @State private var autoDuration: Double = 5.0 // minutes
     
     @State private var isManualFanOn: Bool = false
+    // Manual Mode State
     @State private var manualFanPower: Double = 50.0
     
     @State private var isAutoMode: Bool = true
@@ -96,6 +100,12 @@ struct ContentView: View {
                 }
             }
             .ignoresSafeArea(edges: .bottom)
+        }
+        .onAppear {
+            esp32.startPolling()
+        }
+        .onDisappear {
+            esp32.stopPolling()
         }
         .preferredColorScheme(.dark)
         .sheet(isPresented: $isShowingHistory) {
