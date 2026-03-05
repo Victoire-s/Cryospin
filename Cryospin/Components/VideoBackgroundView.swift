@@ -5,12 +5,17 @@ import AVFoundation
 struct VideoBackgroundView: UIViewRepresentable {
     var videoName: String
     var videoExtension: String
+    @Binding var isPlaying: Bool
     
     func makeUIView(context: Context) -> UIView {
         return LoopingPlayerUIView(videoName: videoName, videoExtension: videoExtension)
     }
     
-    func updateUIView(_ uiView: UIView, context: Context) {}
+    func updateUIView(_ uiView: UIView, context: Context) {
+        if let playerView = uiView as? LoopingPlayerUIView {
+            playerView.setPlaying(isPlaying)
+        }
+    }
 }
 
 class LoopingPlayerUIView: UIView {
@@ -20,7 +25,6 @@ class LoopingPlayerUIView: UIView {
     init(videoName: String, videoExtension: String) {
         super.init(frame: .zero)
         
-        // Load the video from the app bundle
         guard let fileUrl = Bundle.main.url(forResource: videoName, withExtension: videoExtension) else {
             print("Erreur : Impossible de trouver la vidéo \(videoName).\(videoExtension)")
             return
@@ -29,19 +33,24 @@ class LoopingPlayerUIView: UIView {
         let asset = AVAsset(url: fileUrl)
         let item = AVPlayerItem(asset: asset)
         
-        // Use an AVQueuePlayer to allow for seamless looping
         let queuePlayer = AVQueuePlayer(playerItem: item)
-        queuePlayer.isMuted = true // Mute the background video
+        queuePlayer.isMuted = true
         
         playerLayer.player = queuePlayer
-        playerLayer.videoGravity = .resizeAspectFill // Fill the entire screen
+        playerLayer.videoGravity = .resizeAspectFill
         layer.addSublayer(playerLayer)
         
-        // Create the looper
         playerLooper = AVPlayerLooper(player: queuePlayer, templateItem: item)
-        
-        // Start playing
-        queuePlayer.play()
+    }
+    
+    func setPlaying(_ isPlaying: Bool) {
+        if let queuePlayer = playerLayer.player as? AVQueuePlayer {
+            if isPlaying {
+                queuePlayer.play()
+            } else {
+                queuePlayer.pause()
+            }
+        }
     }
     
     override func layoutSubviews() {

@@ -9,7 +9,7 @@ struct OnboardingView: View {
             title: "Bienvenue sur Cryospin",
             description: "Le collier intelligent qui s'adapte à votre température corporelle en temps réel.",
             icon: nil,
-            color: .cyan
+            color: Color(red: 0.106, green: 0.118, blue: 0.894)
         ),
         FeatureInfo(
             title: "Mode Automatique",
@@ -33,7 +33,7 @@ struct OnboardingView: View {
     
     var body: some View {
         ZStack {
-            VideoBackgroundView(videoName: "background", videoExtension: "mov")
+            VideoBackgroundView(videoName: "background", videoExtension: "mov", isPlaying: .constant(true))
                 .ignoresSafeArea()
             Color.black.opacity(0.6).ignoresSafeArea()
             

@@ -18,12 +18,13 @@ struct ControlCard<Content: View>: View {
             content
         }
         .padding(20)
-        .background(Color.white.opacity(0.05))
+        .background(Rectangle().fill(.ultraThinMaterial))
         .cornerRadius(20)
         .overlay(
             RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                .stroke(Color.white.opacity(0.25), lineWidth: 1)
         )
+        .shadow(color: Color(red: 0.106, green: 0.118, blue: 0.894).opacity(0.15), radius: 12, x: 0, y: 4)
         .padding(.horizontal, 20)
     }
 }
