@@ -116,7 +116,7 @@ struct ContentView: View {
                         value: $startTemp,
                         range: 35...42,
                         unit: "°C",
-                        color: .red
+                        color: Color(red: 0.235, green: 0.0, blue: 0.490)  // #3C007D chaud
                     )
                     
                     DualSliderView(
@@ -124,7 +124,7 @@ struct ContentView: View {
                         value: $endTemp,
                         range: 34...40,
                         unit: "°C",
-                        color: .blue
+                        color: Color(red: 0.0, green: 0.180, blue: 0.710)  // #002EB5 froid
                     )
                 }
             }
@@ -136,7 +136,7 @@ struct ContentView: View {
                         value: $autoFanPower,
                         range: 0...100,
                         unit: "%",
-                        color: Color(red: 0.106, green: 0.118, blue: 0.894)
+                        color: Color(red: 0.0, green: 0.180, blue: 0.710)  // #002EB5
                     )
                     
                     DualSliderView(
@@ -160,7 +160,7 @@ struct ContentView: View {
                         value: $manualFanPower,
                         range: 0...100,
                         unit: "%",
-                        color: Color(red: 0.106, green: 0.118, blue: 0.894)
+                        color: Color(red: 0.0, green: 0.180, blue: 0.710)  // #002EB5
                     )
                 }
                 .blur(radius: isManualFanOn ? 0 : 6)

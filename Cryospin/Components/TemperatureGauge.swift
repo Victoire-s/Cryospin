@@ -54,7 +54,10 @@ struct TemperatureGauge: View {
                 Circle()
                     .trim(from: 0.25, to: 0.75) // Always fully drawn
                     .stroke(
-                        LinearGradient(colors: [Color.cyan, Color(red: 0.106, green: 0.118, blue: 0.894)], startPoint: .bottom, endPoint: .top),
+                        LinearGradient(
+                            colors: [Color(red: 0.0, green: 0.180, blue: 0.710), Color(red: 0.235, green: 0.0, blue: 0.490)],
+                            startPoint: .bottom, endPoint: .top  // bas=froid (#002EB5), haut=chaud (#3C007D)
+                        ),
                         style: StrokeStyle(lineWidth: arcWidth, lineCap: .butt)
                     )
                     .frame(width: radius * 2, height: radius * 2)
@@ -140,7 +143,7 @@ struct TemperatureGauge: View {
                                         VStack(spacing: 2) {
                                             Image(systemName: "arrow.up")
                                                 .font(.system(size: 14, weight: .bold))
-                                                .foregroundColor(.red)
+                                                .foregroundColor(Color(red: 0.235, green: 0.0, blue: 0.490))  // purple chaud
                                                 .padding(.top, 2)
                                             Text("\(Int(startTemp))°")
                                                 .font(.system(size: 18, weight: .bold))
@@ -157,7 +160,7 @@ struct TemperatureGauge: View {
                                         VStack(spacing: 2) {
                                             Image(systemName: "arrow.down")
                                                 .font(.system(size: 14, weight: .bold))
-                                                .foregroundColor(.blue)
+                                                .foregroundColor(Color(red: 0.0, green: 0.180, blue: 0.710))  // blue froid
                                                 .padding(.top, 2)
                                             Text("\(Int(endTemp))°")
                                                 .font(.system(size: 18, weight: .bold))
@@ -176,7 +179,7 @@ struct TemperatureGauge: View {
                                     }) {
                                         ZStack {
                                             RoundedRectangle(cornerRadius: 16)
-                                                .fill(isManualFanOn ? Color(red: 0.106, green: 0.118, blue: 0.894) : Color.white.opacity(0.2))
+                                                .fill(isManualFanOn ? Color(red: 0.0, green: 0.180, blue: 0.710) : Color.white.opacity(0.2))
                                                 .frame(width: 60, height: 60)
                                                 .animation(.easeInOut(duration: 0.3), value: isManualFanOn)
                                             Image(systemName: "power")
