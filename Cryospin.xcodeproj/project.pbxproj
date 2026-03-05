@@ -6,8 +6,44 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E749862B2F5758F300B9019F /* CryoSpineWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E74986212F5758F000B9019F /* CryoSpineWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E74986292F5758F300B9019F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6A9B8DE52F55D8A800030026 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E74986202F5758F000B9019F;
+			remoteInfo = "CryoSpineWatch Watch App";
+		};
+		E74986612F58735700B9019F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6A9B8DE52F55D8A800030026 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E74986202F5758F000B9019F;
+			remoteInfo = "CryoSpineWatch Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E749862F2F5758F300B9019F /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				E749862B2F5758F300B9019F /* CryoSpineWatch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		6A9B8DED2F55D8A800030026 /* Cryospin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cryospin.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E74986212F5758F000B9019F /* CryoSpineWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CryoSpineWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +52,22 @@
 			path = Cryospin;
 			sourceTree = "<group>";
 		};
+		E74986222F5758F000B9019F /* CryoSpineWatch Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "CryoSpineWatch Watch App";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		6A9B8DEA2F55D8A800030026 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E749861E2F5758F000B9019F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +81,8 @@
 			isa = PBXGroup;
 			children = (
 				6A9B8DEF2F55D8A800030026 /* Cryospin */,
+				E74986222F5758F000B9019F /* CryoSpineWatch Watch App */,
+				E74986602F58735500B9019F /* Frameworks */,
 				6A9B8DEE2F55D8A800030026 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,8 +91,16 @@
 			isa = PBXGroup;
 			children = (
 				6A9B8DED2F55D8A800030026 /* Cryospin.app */,
+				E74986212F5758F000B9019F /* CryoSpineWatch Watch App.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		E74986602F58735500B9019F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -55,10 +113,13 @@
 				6A9B8DE92F55D8A800030026 /* Sources */,
 				6A9B8DEA2F55D8A800030026 /* Frameworks */,
 				6A9B8DEB2F55D8A800030026 /* Resources */,
+				E749862F2F5758F300B9019F /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				E749862A2F5758F300B9019F /* PBXTargetDependency */,
+				E74986622F58735700B9019F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				6A9B8DEF2F55D8A800030026 /* Cryospin */,
@@ -68,6 +129,28 @@
 			);
 			productName = Cryospin;
 			productReference = 6A9B8DED2F55D8A800030026 /* Cryospin.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E74986202F5758F000B9019F /* CryoSpineWatch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E749862C2F5758F300B9019F /* Build configuration list for PBXNativeTarget "CryoSpineWatch Watch App" */;
+			buildPhases = (
+				E749861D2F5758F000B9019F /* Sources */,
+				E749861E2F5758F000B9019F /* Frameworks */,
+				E749861F2F5758F000B9019F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E74986222F5758F000B9019F /* CryoSpineWatch Watch App */,
+			);
+			name = "CryoSpineWatch Watch App";
+			packageProductDependencies = (
+			);
+			productName = "CryoSpineWatch Watch App";
+			productReference = E74986212F5758F000B9019F /* CryoSpineWatch Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -81,6 +164,9 @@
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					6A9B8DEC2F55D8A800030026 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					E74986202F5758F000B9019F = {
 						CreatedOnToolsVersion = 26.3;
 					};
 				};
@@ -100,12 +186,20 @@
 			projectRoot = "";
 			targets = (
 				6A9B8DEC2F55D8A800030026 /* Cryospin */,
+				E74986202F5758F000B9019F /* CryoSpineWatch Watch App */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		6A9B8DEB2F55D8A800030026 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E749861F2F5758F000B9019F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +216,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E749861D2F5758F000B9019F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E749862A2F5758F300B9019F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E74986202F5758F000B9019F /* CryoSpineWatch Watch App */;
+			targetProxy = E74986292F5758F300B9019F /* PBXContainerItemProxy */;
+		};
+		E74986622F58735700B9019F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E74986202F5758F000B9019F /* CryoSpineWatch Watch App */;
+			targetProxy = E74986612F58735700B9019F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		6A9B8DF62F55D8AA00030026 /* Debug */ = {
@@ -246,7 +360,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = ZJJ547GHZ8;
+				DEVELOPMENT_TEAM = W6GR3H56B8;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -276,7 +390,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.cryospin.Cryospin;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cryospin.Cryospine;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -299,7 +413,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = ZJJ547GHZ8;
+				DEVELOPMENT_TEAM = W6GR3H56B8;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -329,7 +443,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.cryospin.Cryospin;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cryospin.Cryospine;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -342,6 +456,75 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Release;
+		};
+		E749862D2F5758F300B9019F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W6GR3H56B8;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = CryoSpineWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.cryospin.Cryospine;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cryospin.Cryospine.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Debug;
+		};
+		E749862E2F5758F300B9019F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W6GR3H56B8;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = CryoSpineWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.cryospin.Cryospine;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cryospin.Cryospine.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
 			};
 			name = Release;
 		};
@@ -362,6 +545,15 @@
 			buildConfigurations = (
 				6A9B8DF92F55D8AA00030026 /* Debug */,
 				6A9B8DFA2F55D8AA00030026 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E749862C2F5758F300B9019F /* Build configuration list for PBXNativeTarget "CryoSpineWatch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E749862D2F5758F300B9019F /* Debug */,
+				E749862E2F5758F300B9019F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
