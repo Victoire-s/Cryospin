@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedTab = 0
-    @State private var currentTemp: Double = 37.2
+    @StateObject private var tempService = TemperatureService()
     
     @State private var startTemp: Double = 38.0
     @State private var endTemp: Double = 36.5
@@ -15,6 +15,7 @@ struct ContentView: View {
     @StateObject private var esp32 = ESP32Service()
     
     @State private var isVideoPlaying: Bool = true
+    @State private var isShowingHistory: Bool = false
     
     @Namespace private var menuAnimation
     
@@ -59,10 +60,10 @@ struct ContentView: View {
                             Spacer(minLength: 120)
                             
                             TemperatureGauge(
-                                currentTemp: currentTemp,
+                                currentTemp: tempService.currentTemp,
                                 startTemp: selectedTab == 0 ? startTemp : nil,
                                 endTemp: selectedTab == 0 ? endTemp : nil,
-                                isFanActive: selectedTab == 1 ? isManualFanOn : currentTemp >= startTemp
+                                isFanActive: selectedTab == 1 ? isManualFanOn : tempService.currentTemp >= startTemp
                             )
                             
                             Spacer(minLength: 80)
@@ -119,6 +120,13 @@ struct ContentView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .sheet(isPresented: $isShowingHistory) {
+            SessionHistoryView(history: tempService.dailyHistory)
+                .presentationDetents([.fraction(0.8)]) // Takes up exactly 80% screen
+                .presentationDragIndicator(.hidden) // We have custom drag indicator in SessionHistoryView
+                .presentationCornerRadius(30)
+                .presentationBackground(.clear) // To let our own glassmorphism background shine
+        }
     }
     
     var autoModeControls: some View {
@@ -163,7 +171,11 @@ struct ContentView: View {
                 }
             }
             
-            Button(action: {}) {
+            Button(action: {
+                let generator = UIImpactFeedbackGenerator(style: .medium)
+                generator.impactOccurred()
+                isShowingHistory = true
+            }) {
                 HStack {
                     Image(systemName: "chart.xyaxis.line")
                     Text("Historique des sessions")
