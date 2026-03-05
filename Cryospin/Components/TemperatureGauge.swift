@@ -101,7 +101,7 @@ struct TemperatureGauge: View {
                         
                         // Buttons
                         VStack(alignment: .leading, spacing: 15) {
-                            // Mode Pill Button
+                            // Mode Rectangular Button (Style image_14ae44.jpg)
                             Button(action: {
                                 withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
                                     isAutoMode.toggle()
@@ -114,7 +114,7 @@ struct TemperatureGauge: View {
                                         .font(.system(size: 16, weight: .medium))
                                         .foregroundColor(.black)
                                         .contentTransition(.interpolate)
-                                        .frame(width: 55, alignment: .leading)
+                                        .frame(width: 55, height:38, alignment: .leading)
                                     
                                     ZStack {
                                         Circle()
@@ -129,8 +129,10 @@ struct TemperatureGauge: View {
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 10)
                                 .background(Color.white)
-                                .clipShape(Capsule())
+                                // REMPLACEMENT ICI : RoundedRectangle au lieu de Capsule
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
                             }
+                        
                             
                             // Parameter Buttons
                             HStack(spacing: 15) {
