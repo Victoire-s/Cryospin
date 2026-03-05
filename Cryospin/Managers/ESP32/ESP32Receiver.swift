@@ -15,7 +15,7 @@ final class ESP32Receiver {
     func fetchDeviceState(
         completion: @escaping (Result<ESP32DeviceState, ESP32ServiceError>) -> Void
     ) {
-        guard let url = URL(string: baseURL + "/api/status") else {
+        guard let url = URL(string: baseURL + "/api/data") else {
             completion(.failure(.invalidURL))
             return
         }

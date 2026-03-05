@@ -76,10 +76,10 @@ struct ContentView: View {
                             TemperatureGauge(
                                 isAutoMode: $isAutoMode,
                                 isManualFanOn: $isManualFanOn,
-                                currentTemp: tempService.currentTemp,
+                                currentTemp: esp32.hotTemperature,
                                 startTemp: startTemp,
                                 endTemp: endTemp,
-                                isFanActive: isAutoMode ? (tempService.currentTemp >= startTemp) : isManualFanOn
+                                isFanActive: isAutoMode ? (esp32.hotTemperature >= startTemp) : esp32.isActive
                             )
                             
                             Spacer(minLength: 80)
@@ -158,9 +158,33 @@ struct ContentView: View {
                     )
                 }
             }
+            ControlCard(title: "Actions API") {
+                HStack(spacing: 20) {
+                    Button(action: {
+                        esp32.setTargetTemperature(endTemp)
+                    }) {
+                        Text("Appliquer consigne")
+                            .font(.subheadline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color(red: 0.0, green: 0.180, blue: 0.710)) // blue froid
+                            .cornerRadius(10)
+                    }
+                    
+                    Button(action: {
+                        esp32.resetTargetTemperature()
+                    }) {
+                        Text("Reset (20°C)")
+                            .font(.subheadline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.white.opacity(0.2))
+                            .cornerRadius(10)
+                    }
+                }
+            }
         }
     }
-    
     var manualModeControls: some View {
         VStack(spacing: 25) {
             ControlCard(title: "Contrôle manuel") {
@@ -173,11 +197,22 @@ struct ContentView: View {
                         color: Color(red: 0.0, green: 0.180, blue: 0.710)  // #002EB5
                     )
                 }
-                .blur(radius: isManualFanOn ? 0 : 6)
-                .disabled(!isManualFanOn)
-                .animation(.easeInOut(duration: 0.3), value: isManualFanOn)
+                .blur(radius: esp32.isActive ? 0 : 6)
+                .disabled(!esp32.isActive)
+                .animation(.easeInOut(duration: 0.3), value: esp32.isActive)
             }
-            
+        }
+        .onChange(of: isManualFanOn) { newValue in
+            if newValue {
+                esp32.turnOn()
+            } else {
+                esp32.turnOff()
+            }
+        }
+        .onChange(of: esp32.isActive) { newValue in
+            if isManualFanOn != newValue {
+                isManualFanOn = newValue
+            }
         }
     }
 }

@@ -18,18 +18,20 @@ final class ESP32Sender {
         sendRequest(path: endpoint, queryItems: [], completion: completion)
     }
 
-    func sendConfiguration(
-        _ configuration: ESP32FanConfiguration,
+    func sendTargetTemp(
+        temp: Double,
         completion: @escaping (Result<Void, ESP32ServiceError>) -> Void
     ) {
         let queryItems = [
-            URLQueryItem(name: "minTemp", value: String(configuration.minTemperature)),
-            URLQueryItem(name: "maxTemp", value: String(configuration.maxTemperature)),
-            URLQueryItem(name: "fanPower", value: String(configuration.fanPower)),
-            URLQueryItem(name: "durationMinutes", value: String(configuration.activationDurationMinutes))
+            URLQueryItem(name: "temp", value: String(format: "%.1f", temp))
         ]
+        sendRequest(path: "/api/set", queryItems: queryItems, completion: completion)
+    }
 
-        sendRequest(path: "/api/config", queryItems: queryItems, completion: completion)
+    func sendReset(
+        completion: @escaping (Result<Void, ESP32ServiceError>) -> Void
+    ) {
+        sendRequest(path: "/api/reset", queryItems: [], completion: completion)
     }
 
     private func sendRequest(

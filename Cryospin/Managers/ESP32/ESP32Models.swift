@@ -1,15 +1,24 @@
 import Foundation
 
-struct ESP32FanConfiguration {
-    let minTemperature: Double
-    let maxTemperature: Double
-    let fanPower: Double
-    let activationDurationMinutes: Double
-}
-
 struct ESP32DeviceState: Decodable {
-    let isOn: Bool
-    let bodyTemperature: Double
+    let tempHot: Double
+    let tempBody: Double
+    let targetTemp: Double
+    let peltierState: String
+    let fanState: String
+    let isActive: Bool
+    let isOverheating: Bool
+
+    // Map JSON keys to Swift property names
+    enum CodingKeys: String, CodingKey {
+        case tempHot = "temp_hot"
+        case tempBody = "temp_body"
+        case targetTemp = "cible"
+        case peltierState = "peltier"
+        case fanState = "fans"
+        case isActive = "actif"
+        case isOverheating = "en_surchauffe"
+    }
 }
 
 enum ESP32ServiceError: LocalizedError {
