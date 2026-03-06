@@ -8,6 +8,9 @@ struct TemperatureGauge: View {
     var endTemp: Double
     var isFanActive: Bool
     
+    // NOUVEAU : Accès au thème pour les couleurs dynamiques
+    @StateObject private var theme = ThemeManager()
+    
     let minT: Double = 30.0
     let range: Double = 12.0
     
@@ -24,23 +27,14 @@ struct TemperatureGauge: View {
             let cy = height / 2
             
             let tempPercent = percent(for: currentTemp)
-            let currentTrim = 0.25 + (tempPercent * 0.5)
-            
-            // Calculate indicator position
             let currentAngle = 90 + (tempPercent * 180)
             let radAngle = currentAngle * .pi / 180
             
-            // White oval indicator on outer edge of the arc
             let arcWidth: CGFloat = 40
-            let outerRadius = radius + arcWidth / 2  // outer edge of the arc
+            let outerRadius = radius + arcWidth / 2
             
             let c = CGFloat(cos(radAngle))
             let s = CGFloat(sin(radAngle))
-            
-            let dotX = cx + outerRadius * c
-            let dotY = cy + outerRadius * s
-            let dotW: CGFloat = 14   // slightly oval
-            let dotH: CGFloat = 20
             
             ZStack {
                 // Background arc
@@ -50,24 +44,22 @@ struct TemperatureGauge: View {
                     .frame(width: radius * 2, height: radius * 2)
                     .position(x: cx, y: cy)
                 
-                // Foreground arc (gradient)
+                // Foreground arc (DYNAMIQUE)
                 Circle()
-                    .trim(from: 0.25, to: 0.75) // Always fully drawn
+                    .trim(from: 0.25, to: 0.75)
                     .stroke(
                         LinearGradient(
-                            colors: [Color(red: 0.0, green: 0.180, blue: 0.710), Color(red: 0.235, green: 0.0, blue: 0.490)],
-                            startPoint: .bottom, endPoint: .top  // bas=froid (#002EB5), haut=chaud (#3C007D)
+                            colors: [theme.secondaryColor, theme.primaryColor], // Utilise le bleu et violet du thème
+                            startPoint: .bottom, endPoint: .top
                         ),
                         style: StrokeStyle(lineWidth: arcWidth, lineCap: .butt)
                     )
                     .frame(width: radius * 2, height: radius * 2)
                     .position(x: cx, y: cy)
                 
-                // Triangle indicator on the outer edge of the arc
+                // Triangle indicator
                 let triSize: CGFloat = 12
                 Path { path in
-                    // Triangle pointing outward (radially away from center)
-                    // Base is perpendicular to the radial direction, tip points outward
                     let tipX = cx + (outerRadius + triSize) * c
                     let tipY = cy + (outerRadius + triSize) * s
                     let base1X = cx + (outerRadius - triSize * 0.5) * c - triSize * s
@@ -101,93 +93,59 @@ struct TemperatureGauge: View {
                         
                         // Buttons
                         VStack(alignment: .leading, spacing: 15) {
-                            // Mode Rectangular Button (Style image_14ae44.jpg)
+                            // Mode Button
                             Button(action: {
                                 withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
                                     isAutoMode.toggle()
                                 }
-                                let generator = UIImpactFeedbackGenerator(style: .light)
-                                generator.impactOccurred()
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             }) {
                                 HStack {
                                     Text(isAutoMode ? "Auto" : "Manuel")
-                                        .font(.system(size: 16, weight: .medium))
+                                        .font(.system(size: 16, weight: .bold)) // Passé en Bold pour l'équilibre
                                         .foregroundColor(.black)
-                                        .contentTransition(.interpolate)
-                                        .frame(width: 55, height:38, alignment: .leading)
+                                        .frame(width: 65, height: 38, alignment: .leading)
                                     
                                     ZStack {
                                         Circle()
-                                            .fill(Color.gray.opacity(0.5))
+                                            .fill(Color.gray.opacity(0.3))
                                             .frame(width: 24, height: 24)
                                         Text(isAutoMode ? "A" : "M")
                                             .font(.system(size: 14, weight: .bold))
                                             .foregroundColor(.white)
-                                            .contentTransition(.interpolate)
                                     }
                                 }
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 10)
                                 .background(Color.white)
-                                // REMPLACEMENT ICI : RoundedRectangle au lieu de Capsule
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
                             }
-                        
                             
                             // Parameter Buttons
                             HStack(spacing: 15) {
                                 if isAutoMode {
-                                    // First square — start temp
-                                    ZStack {
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .fill(Color.white)
-                                            .frame(width: 60, height: 60)
-                                        VStack(spacing: 2) {
-                                            Image(systemName: "arrow.up")
-                                                .font(.system(size: 14, weight: .bold))
-                                                .foregroundColor(Color(red: 0.235, green: 0.0, blue: 0.490))  // purple chaud
-                                                .padding(.top, 2)
-                                            Text("\(Int(startTemp))°")
-                                                .font(.system(size: 18, weight: .bold))
-                                                .foregroundColor(.black)
-                                        }
-                                        .transition(.opacity.combined(with: .scale(scale: 0.8)))
-                                    }
+                                    // Start Temp Badge
+                                    TemperatureBadge(value: "\(Int(startTemp))°", icon: "arrow.up", color: theme.primaryColor)
                                     
-                                    // Second square — end temp
-                                    ZStack {
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .fill(Color.white)
-                                            .frame(width: 60, height: 60)
-                                        VStack(spacing: 2) {
-                                            Image(systemName: "arrow.down")
-                                                .font(.system(size: 14, weight: .bold))
-                                                .foregroundColor(Color(red: 0.0, green: 0.180, blue: 0.710))  // blue froid
-                                                .padding(.top, 2)
-                                            Text("\(Int(endTemp))°")
-                                                .font(.system(size: 18, weight: .bold))
-                                                .foregroundColor(.black)
-                                        }
-                                        .transition(.opacity.combined(with: .scale(scale: 0.8)))
-                                    }
+                                    // End Temp Badge
+                                    TemperatureBadge(value: "\(Int(endTemp))°", icon: "arrow.down", color: theme.secondaryColor)
+                                    
                                 } else {
-                                    // Power button — toggles fan & blur
+                                    // Power button (DYNAMIQUE)
                                     Button(action: {
                                         withAnimation(.easeInOut(duration: 0.3)) {
                                             isManualFanOn.toggle()
                                         }
-                                        let generator = UIImpactFeedbackGenerator(style: .medium)
-                                        generator.impactOccurred()
+                                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                     }) {
                                         ZStack {
                                             RoundedRectangle(cornerRadius: 16)
-                                                .fill(isManualFanOn ? Color(red: 0.0, green: 0.180, blue: 0.710) : Color.white.opacity(0.2))
+                                                .fill(isManualFanOn ? theme.secondaryColor : Color.white.opacity(0.2))
                                                 .frame(width: 60, height: 60)
-                                                .animation(.easeInOut(duration: 0.3), value: isManualFanOn)
+                                            
                                             Image(systemName: "power")
-                                                .font(.system(size: 24))
+                                                .font(.system(size: 24, weight: .bold))
                                                 .foregroundColor(isManualFanOn ? .white : .gray)
-                                                .animation(.easeInOut(duration: 0.3), value: isManualFanOn)
                                         }
                                     }
                                     .transition(.opacity.combined(with: .scale(scale: 0.8)))
@@ -195,12 +153,36 @@ struct TemperatureGauge: View {
                             }
                         }
                     }
-                    .padding(.leading, 30) // Offset from the left edge of screen
-                    
+                    .padding(.leading, 30)
                     Spacer()
                 }
             }
         }
         .frame(height: 420)
+    }
+}
+
+// Composant réutilisable pour les petits carrés de température
+struct TemperatureBadge: View {
+    let value: String
+    let icon: String
+    let color: Color
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white)
+                .frame(width: 60, height: 60)
+            VStack(spacing: 2) {
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(color)
+                    .padding(.top, 2)
+                Text(value)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.black)
+            }
+        }
+        .transition(.opacity.combined(with: .scale(scale: 0.8)))
     }
 }

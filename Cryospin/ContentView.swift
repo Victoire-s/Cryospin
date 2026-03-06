@@ -8,6 +8,7 @@ struct ContentView: View {
     @AppStorage("emergencyName") private var emergencyName: String = ""
     @AppStorage("emergencyPhone") private var emergencyPhone: String = ""
     @State private var isShowingSettings = false
+    @StateObject private var theme = ThemeManager()
     
     // --- AUTO MODE STATE ---
     @State private var startTemp: Double = 38.0
@@ -36,9 +37,13 @@ struct ContentView: View {
             
             // FILTRE SOMBRE (S'active si la vidéo est en pause pour le look LiquidGlass)
             Color.black
-                .ignoresSafeArea()
-                .opacity(isVideoPlaying ? 0 : 0.85)
-                .animation(.easeInOut(duration: 0.6), value: isVideoPlaying)
+                .opacity(theme.isHighContrastMode ? 1.0 : (theme.isVideoPlaying ? 0 : 0.4))
+                // Explication :
+                // - Si mode contraste élevé : Noir total (1.0)
+                // - Si vidéo en lecture : Transparent (0)
+                // - Si vidéo en pause simple : Léger assombrissement (0.4) pour le look LiquidGlass
+                .animation(.easeInOut(duration: 0.6), value: theme.isHighContrastMode)
+                .animation(.easeInOut(duration: 0.6), value: theme.isVideoPlaying)
             
             VStack(spacing: 0) {
                 // HEADER ÉPURÉ
@@ -174,23 +179,64 @@ struct ContentView: View {
         VStack(spacing: 25) {
             ControlCard(title: "Seuils de déclenchement") {
                 VStack(spacing: 20) {
-                    DualSliderView(title: "Température de début", value: $startTemp, range: 35...42, unit: "°C", color: Color(red: 0.235, green: 0.0, blue: 0.490))
-                    DualSliderView(title: "Température de fin", value: $endTemp, range: 34...40, unit: "°C", color: Color(red: 0.0, green: 0.180, blue: 0.710))
+                    DualSliderView(
+                        title: "Température de début",
+                        value: $startTemp,
+                        range: 35...42,
+                        unit: "°C",
+                        color: theme.primaryColor // Utilise le Violet (ou la couleur choisie)
+                    )
+                    
+                    DualSliderView(
+                        title: "Température de fin",
+                        value: $endTemp,
+                        range: 34...40,
+                        unit: "°C",
+                        color: theme.secondaryColor // Utilise le Bleu (ou la couleur choisie)
+                    )
                 }
             }
             ControlCard(title: "Paramètres de ventilation") {
                 VStack(spacing: 20) {
-                    DualSliderView(title: "Puissance", value: $autoFanPower, range: 0...100, unit: "%", color: Color(red: 0.0, green: 0.180, blue: 0.710))
-                    DualSliderView(title: "Optionnel: Durée fixe", value: $autoDuration, range: 0...60, unit: " min", color: .white)
+                    // Utilise la couleur secondaire (Bleu par défaut)
+                    DualSliderView(
+                        title: "Puissance",
+                        value: $autoFanPower,
+                        range: 0...100,
+                        unit: "%",
+                        color: theme.secondaryColor
+                    )
+                    
+                    // On peut garder .white ou utiliser theme.secondaryColor.opacity(0.5)
+                    DualSliderView(
+                        title: "Optionnel: Durée fixe",
+                        value: $autoDuration,
+                        range: 0...60,
+                        unit: " min",
+                        color: .white
+                    )
                 }
             }
             ControlCard(title: "Actions API") {
                 HStack(spacing: 20) {
                     Button(action: { esp32.setTargetTemperature(endTemp) }) {
-                        Text("Appliquer consigne").font(.subheadline).foregroundColor(.white).padding().background(Color(red: 0.0, green: 0.180, blue: 0.710)).cornerRadius(10)
+                        Text("Appliquer consigne")
+                            .font(.subheadline)
+                            .fontWeight(theme.isHighContrastMode ? .bold : .medium) // Optionnel: plus gras en contraste élevé
+                            .foregroundColor(theme.adaptiveTextColor) // adapté la couleur par rapport au mode
+                            .padding()
+                            // On utilise la couleur secondaire (Bleu) du thème
+                            .background(theme.secondaryColor)
+                            .cornerRadius(10)
                     }
+                    
                     Button(action: { esp32.resetTargetTemperature() }) {
-                        Text("Reset (20°C)").font(.subheadline).foregroundColor(.white).padding().background(Color.white.opacity(0.2)).cornerRadius(10)
+                        Text("Reset (20°C)")
+                            .font(.subheadline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.white.opacity(0.2))
+                            .cornerRadius(10)
                     }
                 }
             }
@@ -201,7 +247,14 @@ struct ContentView: View {
         VStack(spacing: 25) {
             ControlCard(title: "Contrôle manuel") {
                 VStack(spacing: 20) {
-                    DualSliderView(title: "Puissance", value: $manualFanPower, range: 0...100, unit: "%", color: Color(red: 0.0, green: 0.180, blue: 0.710))
+                    // Remplacement par theme.secondaryColor (Bleu par défaut)
+                    DualSliderView(
+                        title: "Puissance",
+                        value: $manualFanPower,
+                        range: 0...100,
+                        unit: "%",
+                        color: theme.secondaryColor
+                    )
                 }
                 .blur(radius: esp32.isActive ? 0 : 6)
                 .disabled(!esp32.isActive)

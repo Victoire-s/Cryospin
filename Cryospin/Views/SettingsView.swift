@@ -3,31 +3,46 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
     @AppStorage("isVideoPlaying") private var isVideoPlaying: Bool = true
+    @StateObject private var theme = ThemeManager()
     
     var body: some View {
         NavigationStack {
             ZStack {
-                // 1. On retire Color.black pour laisser voir la vidéo du ContentView
-                // On utilise une fine couche sombre pour garder la lisibilité du texte
                 Color.black.opacity(0.4).ignoresSafeArea()
                 
                 List {
+                    // --- SECTION PERSONNALISATION (SOUS-PAGE) ---
+                    Section {
+                        NavigationLink {
+                            ThemeCustomizationView(theme: theme)
+                        } label: {
+                            Label("Modifier les couleurs", systemImage: "paintbrush.fill")
+                                .foregroundColor(.white)
+                        }
+                        .listRowBackground(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(.ultraThinMaterial).opacity(0.8)
+                        )
+                    } header: {
+                        Text("Apparence").foregroundColor(.white.opacity(0.6))
+                    }
+
+                    // --- SECTION AFFICHAGE ---
                     Section {
                         Toggle(isOn: $isVideoPlaying) {
                             Label("Animation d'arrière-plan", systemImage: "video.fill")
                                 .foregroundColor(.white)
                         }
                         .tint(.blue)
-                        // 2. L'effet verre dépoli (Liquid Glass)
                         .listRowBackground(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(.ultraThinMaterial) // C'est ici que l'effet se crée
-                                .opacity(0.8)
+                                .fill(.ultraThinMaterial).opacity(0.8)
                         )
                     } header: {
-                        Text("Affichage").foregroundColor(.white.opacity(0.6))
+                        Text("Vidéo").foregroundColor(.white.opacity(0.6))
                     }
 
+                    // --- SECTION SÉCURITÉ ---
                     Section {
                         NavigationLink {
                             EmergencyContactForm()
@@ -37,18 +52,23 @@ struct SettingsView: View {
                         }
                         .listRowBackground(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(.ultraThinMaterial)
-                                .opacity(0.8)
+                                .fill(.ultraThinMaterial).opacity(0.8)
                         )
                     } header: {
                         Text("Sécurité").foregroundColor(.white.opacity(0.6))
                     }
                 }
-                .scrollContentBackground(.hidden) // Très important pour la transparence
+                .scrollContentBackground(.hidden)
             }
-            .navigationTitle("Paramètres")
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Paramètres")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.white)
+                }
+                
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("OK") { dismiss() }
                         .fontWeight(.bold)
@@ -56,6 +76,59 @@ struct SettingsView: View {
             }
         }
         .preferredColorScheme(.dark)
+    }
+}
+
+struct ThemeCustomizationView: View {
+    @ObservedObject var theme: ThemeManager
+    
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.4).ignoresSafeArea()
+            
+            List {
+                // SECTION PRESETS
+                Section {
+                    Picker("Mode d'affichage", selection: $theme.selectedPreset) {
+                        ForEach(AccessibilityPreset.allCases, id: \.self) { preset in
+                            Text(preset.rawValue).tag(preset)
+                        }
+                    }
+                    .onChange(of: theme.selectedPreset) { newValue in
+                        withAnimation {
+                            theme.applyPreset(newValue)
+                        }
+                    }
+                } header: {
+                    Text("Accessibilité").foregroundColor(.white.opacity(0.6))
+                } footer: {
+                    Text("Les modes Daltonisme adaptent les contrastes pour une meilleure distinction des seuils.")
+                }
+                .listRowBackground(Color.white.opacity(0.1))
+
+                // SECTION MANUELLE (Ton code existant)
+                Section {
+                    ColorPicker("Couleur Primaire", selection: $theme.primaryColor)
+                    ColorPicker("Couleur Secondaire", selection: $theme.secondaryColor)
+                } header: {
+                    Text("Personnalisation manuelle").foregroundColor(.white.opacity(0.6))
+                }
+                .listRowBackground(Color.white.opacity(0.1))
+                
+                Section {
+                    Button(action: { theme.resetToDefault() }) {
+                        HStack {
+                            Spacer()
+                            Text("Rétablir les couleurs par défaut").foregroundColor(.red).bold()
+                            Spacer()
+                        }
+                    }
+                }
+                .listRowBackground(Color.white.opacity(0.1))
+            }
+            .scrollContentBackground(.hidden)
+        }
+        .navigationTitle("Couleurs")
     }
 }
 
