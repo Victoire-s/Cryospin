@@ -8,7 +8,7 @@ struct TemperatureGauge: View {
     var endTemp: Double
     var isFanActive: Bool
     
-    // NOUVEAU : Accès au thème pour les couleurs dynamiques
+    @StateObject private var heartRateManager = HeartRateManager()
     @StateObject private var theme = ThemeManager()
     
     let minT: Double = 30.0
@@ -37,19 +37,19 @@ struct TemperatureGauge: View {
             let s = CGFloat(sin(radAngle))
             
             ZStack {
-                // Background arc
+                // 1. Arrière-plan de l'arc
                 Circle()
                     .trim(from: 0.25, to: 0.75)
                     .stroke(Color.white.opacity(0.1), style: StrokeStyle(lineWidth: arcWidth, lineCap: .butt))
                     .frame(width: radius * 2, height: radius * 2)
                     .position(x: cx, y: cy)
                 
-                // Foreground arc (DYNAMIQUE)
+                // 2. Arc de progression (Couleurs Thème)
                 Circle()
                     .trim(from: 0.25, to: 0.75)
                     .stroke(
                         LinearGradient(
-                            colors: [theme.secondaryColor, theme.primaryColor], // Utilise le bleu et violet du thème
+                            colors: [theme.secondaryColor, theme.primaryColor],
                             startPoint: .bottom, endPoint: .top
                         ),
                         style: StrokeStyle(lineWidth: arcWidth, lineCap: .butt)
@@ -57,7 +57,7 @@ struct TemperatureGauge: View {
                     .frame(width: radius * 2, height: radius * 2)
                     .position(x: cx, y: cy)
                 
-                // Triangle indicator
+                // 3. Indicateur Triangle
                 let triSize: CGFloat = 12
                 Path { path in
                     let tipX = cx + (outerRadius + triSize) * c
@@ -75,114 +75,95 @@ struct TemperatureGauge: View {
                 .shadow(color: .black.opacity(0.4), radius: 4)
                 .animation(.spring(response: 0.5, dampingFraction: 0.7), value: radAngle)
                 
-                // Left content
+                // --- POSITIONNEMENT FIXÉ ---
+                
+                // RYTHME CARDIAQUE (Décalé à gauche du centre de l'arc)
+                VStack(spacing: 2) {
+                    Text(heartRateManager.bpm == 0 ? "--" : "\(heartRateManager.bpm)")
+                        .font(.system(size: 70, weight: .medium, design: .rounded))
+                        .foregroundColor(.white)
+                    
+                    Image(systemName: "heart.fill")
+                        .font(.system(size: 28))
+                        .foregroundColor(theme.isHighContrastMode ? theme.secondaryColor : .red)
+                        .scaleEffect(heartRateManager.bpm > 0 ? 1.1 : 1.0)
+                        .animation(heartRateManager.bpm > 0 ? .easeInOut(duration: 0.5).repeatForever() : .default, value: heartRateManager.bpm)
+                }
+                .position(x: cx - 85, y: cy) // Positionnement précis vers l'intérieur
+                
+                // TEMPÉRATURE & BOUTONS (Alignés à gauche de l'écran)
                 HStack {
                     VStack(alignment: .leading, spacing: 40) {
-                        // Temperature Text
-                        VStack(alignment: .leading, spacing: 0) {
+                        VStack(alignment: .leading, spacing: -5) {
                             Text("°C")
-                                .font(.system(size: 24, weight: .medium, design: .rounded))
+                                .font(.system(size: 22, weight: .medium, design: .rounded))
                                 .foregroundColor(.white)
                             
                             Text(String(format: "%.0f", currentTemp))
-                                .font(.system(size: 100, weight: .regular, design: .rounded))
+                                .font(.system(size: 90, weight: .regular, design: .rounded))
                                 .foregroundColor(.white)
-                                .contentTransition(.numericText())
-                                .padding(.top, -10)
                         }
                         
-                        // Buttons
                         VStack(alignment: .leading, spacing: 15) {
-                            // Mode Button
-                            Button(action: {
-                                withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
-                                    isAutoMode.toggle()
-                                }
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            }) {
+                            // Bouton Mode
+                            Button(action: { isAutoMode.toggle() }) {
                                 HStack {
                                     Text(isAutoMode ? "Auto" : "Manuel")
-                                        .font(.system(size: 16, weight: .bold)) // Passé en Bold pour l'équilibre
-                                        .foregroundColor(.black)
-                                        .frame(width: 65, height: 38, alignment: .leading)
-                                    
-                                    ZStack {
-                                        Circle()
-                                            .fill(Color.gray.opacity(0.3))
-                                            .frame(width: 24, height: 24)
-                                        Text(isAutoMode ? "A" : "M")
-                                            .font(.system(size: 14, weight: .bold))
-                                            .foregroundColor(.white)
-                                    }
+                                        .font(.system(size: 16, weight: .bold))
+                                        .foregroundColor(theme.isHighContrastMode ? .white : .black)
+                                        .frame(width: 65, alignment: .leading)
+                                    Circle().fill(Color.gray.opacity(0.3)).frame(width: 24).overlay(Text(isAutoMode ? "A" : "M").font(.caption).bold())
                                 }
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 10)
-                                .background(Color.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                                .padding(10)
+                                .background(theme.isHighContrastMode ? Color.white.opacity(0.1) : Color.white)
+                                .cornerRadius(16)
                             }
                             
-                            // Parameter Buttons
-                            HStack(spacing: 15) {
+                            HStack(spacing: 12) {
                                 if isAutoMode {
-                                    // Start Temp Badge
                                     TemperatureBadge(value: "\(Int(startTemp))°", icon: "arrow.up", color: theme.primaryColor)
-                                    
-                                    // End Temp Badge
                                     TemperatureBadge(value: "\(Int(endTemp))°", icon: "arrow.down", color: theme.secondaryColor)
-                                    
                                 } else {
-                                    // Power button (DYNAMIQUE)
-                                    Button(action: {
-                                        withAnimation(.easeInOut(duration: 0.3)) {
-                                            isManualFanOn.toggle()
-                                        }
-                                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                    }) {
-                                        ZStack {
-                                            RoundedRectangle(cornerRadius: 16)
-                                                .fill(isManualFanOn ? theme.secondaryColor : Color.white.opacity(0.2))
-                                                .frame(width: 60, height: 60)
-                                            
-                                            Image(systemName: "power")
-                                                .font(.system(size: 24, weight: .bold))
-                                                .foregroundColor(isManualFanOn ? .white : .gray)
-                                        }
+                                    Button(action: { isManualFanOn.toggle() }) {
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .fill(isManualFanOn ? theme.secondaryColor : Color.white.opacity(0.2))
+                                            .frame(width: 60, height: 60)
+                                            .overlay(Image(systemName: "power").foregroundColor(isManualFanOn ? theme.adaptiveTextColor : .gray))
                                     }
-                                    .transition(.opacity.combined(with: .scale(scale: 0.8)))
                                 }
                             }
                         }
                     }
-                    .padding(.leading, 30)
+                    .padding(.leading, 20)
                     Spacer()
                 }
             }
         }
         .frame(height: 420)
+        
+        .onAppear {
+            heartRateManager.requestAuthorizationAndStart()
+            heartRateManager.startHeartRateQuery()
+            // Lance la surveillance en temps réel dès que la jauge apparaît
+            Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { _ in
+                    heartRateManager.startHeartRateQuery() // Force un check
+                }
+        }
     }
 }
 
-// Composant réutilisable pour les petits carrés de température
+// COMPOSANT BADGE RECONSTRUIT
 struct TemperatureBadge: View {
     let value: String
     let icon: String
     let color: Color
-    
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white)
-                .frame(width: 60, height: 60)
+            RoundedRectangle(cornerRadius: 16).fill(Color.white).frame(width: 60, height: 60)
             VStack(spacing: 2) {
-                Image(systemName: icon)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(color)
-                    .padding(.top, 2)
-                Text(value)
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(.black)
+                Image(systemName: icon).font(.caption).bold().foregroundColor(color)
+                Text(value).font(.system(size: 18, weight: .bold)).foregroundColor(.black)
             }
         }
-        .transition(.opacity.combined(with: .scale(scale: 0.8)))
     }
 }

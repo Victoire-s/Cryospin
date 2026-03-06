@@ -112,24 +112,30 @@ struct ContentView: View {
                             
                             // --- BOUTON APPEL D'URGENCE (Fixé en bas de liste) ---
                             if !emergencyPhone.isEmpty {
-                                Button(action: triggerEmergencyCall) {
-                                    HStack(spacing: 12) {
-                                        Image(systemName: "phone.fill")
-                                        Text("Urgence : \(emergencyName)")
+                                HStack {
+                                    Spacer() // Centre le bouton
+                                    
+                                    Button(action: triggerEmergencyCall) {
+                                        HStack(spacing: 12) {
+                                            Image(systemName: "phone.fill")
+                                            Text("Urgence : \(emergencyName)")
+                                        }
+                                        .font(.system(size: 16, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 25) // Réduit la largeur effective
+                                        .padding(.vertical, 14)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .fill(Color.red.opacity(0.6))
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 20)
+                                                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                                )
+                                        )
+                                        .shadow(color: .red.opacity(0.3), radius: 10, x: 0, y: 5)
                                     }
-                                    .font(.system(size: 16, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .padding(.vertical, 16)
-                                    .frame(maxWidth: .infinity)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 15)
-                                            .fill(Color.red.opacity(0.6))
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 15)
-                                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                                            )
-                                    )
-                                    .shadow(color: .red.opacity(0.3), radius: 10)
+                                    
+                                    Spacer() // Centre le bouton
                                 }
                                 .padding(.top, 20)
                                 .transition(.opacity.animation(.easeInOut))
@@ -217,28 +223,54 @@ struct ContentView: View {
                     )
                 }
             }
-            ControlCard(title: "Actions API") {
-                HStack(spacing: 20) {
-                    Button(action: { esp32.setTargetTemperature(endTemp) }) {
-                        Text("Appliquer consigne")
-                            .font(.subheadline)
-                            .fontWeight(theme.isHighContrastMode ? .bold : .medium) // Optionnel: plus gras en contraste élevé
-                            .foregroundColor(theme.adaptiveTextColor) // adapté la couleur par rapport au mode
-                            .padding()
-                            // On utilise la couleur secondaire (Bleu) du thème
-                            .background(theme.secondaryColor)
-                            .cornerRadius(10)
+            // Nouveau bouton de validation unique
+            Button(action: {
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.success)
+                esp32.setTargetTemperature(endTemp) // On envoie la température de fin
+            }) {
+                // --- BOUTON VALIDER ÉPURÉ ET CENTRÉ ---
+                HStack {
+                    Spacer() // Pousse le bouton vers le centre
+                    
+                    Button(action: {
+                        // Feedback haptique de succès
+                        let generator = UINotificationFeedbackGenerator()
+                        generator.notificationOccurred(.success)
+                        
+                        // Envoi de la température de fin (endTemp) à l'ESP32 via /api/set
+                        esp32.setTargetTemperature(endTemp)
+                    }) {
+                        Text("Valider la séance")
+                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                            .foregroundColor(theme.adaptiveTextColor)
+                            .padding(.horizontal, 30) // Espace interne latéral
+                            .padding(.vertical, 16)   // Espace interne vertical
+                            .background(
+                                ZStack {
+                                    // Dégradé utilisant tes couleurs de thème
+                                    LinearGradient(
+                                        colors: [theme.primaryColor, theme.secondaryColor],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                    
+                                    // Effet de brillance subtil (LiquidGlass)
+                                    LinearGradient(
+                                        colors: [Color.white.opacity(0.3), Color.clear],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                }
+                            )
+                            .cornerRadius(25) // Plus arrondi pour le nouveau design
+                            .shadow(color: theme.primaryColor.opacity(0.4), radius: 12, x: 0, y: 6)
                     }
                     
-                    Button(action: { esp32.resetTargetTemperature() }) {
-                        Text("Reset (20°C)")
-                            .font(.subheadline)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.white.opacity(0.2))
-                            .cornerRadius(10)
-                    }
+                    Spacer() // Pousse le bouton vers le centre
                 }
+                .padding(.top, 15) // Espace avec les sliders au-dessus
+                .padding(.bottom, 10)
             }
         }
     }
@@ -247,7 +279,6 @@ struct ContentView: View {
         VStack(spacing: 25) {
             ControlCard(title: "Contrôle manuel") {
                 VStack(spacing: 20) {
-                    // Remplacement par theme.secondaryColor (Bleu par défaut)
                     DualSliderView(
                         title: "Puissance",
                         value: $manualFanPower,
@@ -258,15 +289,23 @@ struct ContentView: View {
                 }
                 .blur(radius: esp32.isActive ? 0 : 6)
                 .disabled(!esp32.isActive)
-                .animation(.easeInOut(duration: 0.3), value: esp32.isActive)
             }
         }
+        // Bloc Power (Allumer/Éteindre) - On ne touche à rien ici
         .onChange(of: isManualFanOn) { newValue in
             if newValue { esp32.turnOn() }
             else { esp32.turnOff() }
         }
+        // Bloc Feedback (Synchronisation ESP -> App)
         .onChange(of: esp32.isActive) { newValue in
             if isManualFanOn != newValue { isManualFanOn = newValue }
+        }
+        // Bloc Intensité (CORRIGÉ)
+        .onChange(of: manualFanPower) { newValue in
+            if !isAutoMode && esp32.isActive {
+                // Utilise bien newValue ici
+                esp32.setIntensity(newValue)
+            }
         }
     }
 }

@@ -17,16 +17,12 @@ struct ContentView: View {
                 // ÉCRAN 1 : Bouton Power (MANUEL)
                 VStack {
                     Spacer()
-                    PowerButton(isOn: $isFanOn)
-                        .onChange(of: isFanOn) { newValue in
-                            if newValue {
-                                // Si on allume le manuel, on force l'arrêt visuel de l'auto
-                                isAutoMode = false
-                                esp32.turnOn()
-                            } else {
-                                esp32.turnOff()
-                            }
-                        }
+                    // Dans ta ContentView.swift (Watch)
+                    PowerButton(
+                        isOn: $isFanOn,
+                        actionOn: { esp32.turnOn() },  // Appelle /api/on
+                        actionOff: { esp32.turnOff() } // Appelle /api/off
+                    )
                     Spacer()
                 }
                 .tag(0)

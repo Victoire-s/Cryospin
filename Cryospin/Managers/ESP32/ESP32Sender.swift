@@ -27,6 +27,20 @@ final class ESP32Sender {
         ]
         sendRequest(path: "/api/set", queryItems: queryItems, completion: completion)
     }
+    
+    // Ajoute cette fonction juste après sendTargetTemp
+    func sendIntensity(
+        level: Double,
+        completion: @escaping (Result<Void, ESP32ServiceError>) -> Void
+    ) {
+        // On prépare le paramètre "value" (ou "level" selon ton API ESP32)
+        let queryItems = [
+            URLQueryItem(name: "intensity", value: String(format: "%.0f", level))
+        ]
+        
+        // On utilise la route /api/intensity
+        sendRequest(path: "/api/intensity", queryItems: queryItems, completion: completion)
+    }
 
     func sendReset(
         completion: @escaping (Result<Void, ESP32ServiceError>) -> Void

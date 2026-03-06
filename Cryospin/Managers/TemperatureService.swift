@@ -8,7 +8,7 @@ struct TemperatureDataPoint: Identifiable {
 }
 
 class TemperatureService: ObservableObject {
-    @Published var currentTemp: Double = 37.2
+    @Published var currentTemp: Double = 39.2
     @Published var dailyHistory: [TemperatureDataPoint] = []
     
     private var timer: Timer?

@@ -5,7 +5,7 @@ final class ESP32Service: ObservableObject {
     let baseURL: String
 
     // Nouvelles variables depuis l'API complète
-    @Published var hotTemperature: Double = 32.2
+    @Published var hotTemperature: Double = 37.2
     @Published var bodyTemperature: Double = 22.7
     @Published var targetTemperature: Double = 20.0
     
@@ -162,6 +162,27 @@ final class ESP32Service: ObservableObject {
             }
         }
     }
+    // Dans ESP32Service.swift
+
+    func setIntensity(_ level: Double) {
+        // 1. On lance l'appel via le sender que tu viens de mettre à jour
+        sender.sendIntensity(level: level) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                
+                switch result {
+                case .success:
+                    self.lastRequestStatus = "Intensité envoyée : \(Int(level))%"
+                    // Optionnel : on force un rafraîchissement pour confirmer l'état
+                    self.refreshStatus()
+                case .failure(let error):
+                    self.lastRequestStatus = "Erreur intensité : \(error.localizedDescription)"
+                    print("Erreur API Intensity: \(error)")
+                }
+            }
+        }
+    }
+    
 
     func startPolling() {
         guard pollingCancellable == nil else { return }
